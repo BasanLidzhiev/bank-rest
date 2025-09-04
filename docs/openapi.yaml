@@ -346,14 +346,14 @@ components:
         username:
           type: string
           description: Username
-          example: Alex123
+          example: User123
           maxLength: 50
           minLength: 5
         email:
           type: string
           format: email
           description: Email
-          example: Alex123@gmail.com
+          example: User123@gmail.com
           maxLength: 255
           minLength: 5
         password:
@@ -380,7 +380,7 @@ components:
         username:
           type: string
           description: Username
-          example: Alex123
+          example: User123
           maxLength: 50
           minLength: 5
         password:

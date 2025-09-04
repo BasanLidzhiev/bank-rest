@@ -14,7 +14,7 @@ import ru.lidzhiev.bankcards.dto.CreateUserDto;
 import ru.lidzhiev.bankcards.dto.UserDto;
 import ru.lidzhiev.bankcards.entity.enums.UserRole;
 import ru.lidzhiev.bankcards.security.JwtService;
-import ru.lidzhiev.bankcards.service.impl.UserService;
+import ru.lidzhiev.bankcards.service.UserService;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -39,8 +39,8 @@ class UserControllerTest {
 
     @Test
     void register_ShouldReturnUserDto() throws Exception {
-        CreateUserDto createUserDto = new CreateUserDto("alex12", "alex@mail.com", "pass123", UserRole.ROLE_ADMIN );
-        UserDto userDto = new UserDto(1L, "alex12", "alex@mail.com");
+        CreateUserDto createUserDto = new CreateUserDto("User12", "User@mail.com", "pass123", UserRole.ROLE_ADMIN );
+        UserDto userDto = new UserDto(1L, "User12", "User@mail.com");
 
         Mockito.when(userService.create(any(CreateUserDto.class))).thenReturn(userDto);
 
@@ -48,37 +48,37 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createUserDto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value("alex12"));
+                .andExpect(jsonPath("$.username").value("User12"));
     }
 
     @Test
-    @WithMockUser(username = "alex12", roles = "USER")
+    @WithMockUser(username = "User12", roles = "USER")
     void getCurrentUser_ShouldReturnUserDto() throws Exception {
-        UserDto userDto = new UserDto(1L, "alex12", "alex@mail.com");
+        UserDto userDto = new UserDto(1L, "User12", "User@mail.com");
 
-        Mockito.when(userService.getByUsername("alex12")).thenReturn(userDto);
+        Mockito.when(userService.getByUsername("User12")).thenReturn(userDto);
 
         mockMvc.perform(get("/api/users/me"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value("alex12"));
+                .andExpect(jsonPath("$.username").value("User12"));
     }
 
     @Test
     @WithMockUser(roles = "ADMIN")
     void getById_AsAdmin_ShouldReturnUserDto() throws Exception {
-        UserDto userDto = new UserDto(1L, "alex12", "alex@mail.com");
+        UserDto userDto = new UserDto(1L, "User12", "User@mail.com");
 
         Mockito.when(userService.getById(1L)).thenReturn(userDto);
 
         mockMvc.perform(get("/api/users/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value("alex12"));
+                .andExpect(jsonPath("$.username").value("User12"));
     }
 
     @Test
     @WithMockUser(roles = "ADMIN")
     void updateUser_AsAdmin_ShouldReturnUserDto() throws Exception {
-        UserDto dto = new UserDto(1L, "alex12", "alex@mail.com");
+        UserDto dto = new UserDto(1L, "User12", "User@mail.com");
 
         Mockito.when(userService.updateUser(any(UserDto.class))).thenReturn(dto);
 
@@ -86,7 +86,7 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value("alex12"));
+                .andExpect(jsonPath("$.username").value("User12"));
     }
 
     @Test

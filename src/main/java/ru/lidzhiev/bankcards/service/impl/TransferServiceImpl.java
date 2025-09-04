@@ -1,20 +1,21 @@
 package ru.lidzhiev.bankcards.service.impl;
 
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.lidzhiev.bankcards.entity.Card;
 import ru.lidzhiev.bankcards.entity.Transaction;
 import ru.lidzhiev.bankcards.repository.CardRepository;
 import ru.lidzhiev.bankcards.repository.TransactionRepository;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import ru.lidzhiev.bankcards.service.TransferService;
 
 import java.time.LocalDateTime;
 
 @Service
-public class TransferService {
+public class TransferServiceImpl implements TransferService {
     private final TransactionRepository transactionRepository;
     private final CardRepository cardRepository;
 
-    public TransferService(TransactionRepository transactionRepository, CardRepository cardRepository) {
+    public TransferServiceImpl(TransactionRepository transactionRepository, CardRepository cardRepository) {
         this.transactionRepository = transactionRepository;
         this.cardRepository = cardRepository;
     }

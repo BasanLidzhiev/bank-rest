@@ -11,6 +11,7 @@ import ru.lidzhiev.bankcards.entity.User;
 import ru.lidzhiev.bankcards.entity.enums.UserRole;
 import ru.lidzhiev.bankcards.security.JwtService;
 import ru.lidzhiev.bankcards.service.AuthenticationService;
+import ru.lidzhiev.bankcards.service.UserService;
 
 
 @Service

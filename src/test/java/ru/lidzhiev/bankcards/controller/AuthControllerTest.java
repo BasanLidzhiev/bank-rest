@@ -14,7 +14,7 @@ import ru.lidzhiev.bankcards.dto.SignInRequest;
 import ru.lidzhiev.bankcards.dto.SignUpRequest;
 import ru.lidzhiev.bankcards.security.JwtService;
 import ru.lidzhiev.bankcards.service.AuthenticationService;
-import ru.lidzhiev.bankcards.service.impl.UserService;
+import ru.lidzhiev.bankcards.service.UserService;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -42,7 +42,7 @@ class AuthControllerTest {
     @Test
     void login_ReturnsJwtResponse_WhenCredentialsAreValid() throws Exception {
         SignInRequest signInRequest = new SignInRequest();
-        signInRequest.setUsername("alex12");
+        signInRequest.setUsername("User12");
         signInRequest.setPassword("password123");
 
         JwtAuthenticationResponse jwtResponse = new JwtAuthenticationResponse("mocked-jwt-token");

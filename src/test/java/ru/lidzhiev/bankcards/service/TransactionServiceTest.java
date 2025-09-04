@@ -5,7 +5,8 @@ import ru.lidzhiev.bankcards.entity.Transaction;
 import ru.lidzhiev.bankcards.repository.CardRepository;
 import ru.lidzhiev.bankcards.repository.TransactionRepository;
 import org.junit.jupiter.api.Test;
-import ru.lidzhiev.bankcards.service.impl.TransferService;
+import ru.lidzhiev.bankcards.service.impl.TransferServiceImpl;
+
 
 import java.util.Optional;
 
@@ -17,7 +18,7 @@ class TransactionServiceTest {
 
     private final CardRepository cardRepository = mock(CardRepository.class);
     private final TransactionRepository transactionRepository = mock(TransactionRepository.class);
-    private final TransferService transactionService = new TransferService(transactionRepository, cardRepository);
+    private final TransferService transactionService = new TransferServiceImpl(transactionRepository, cardRepository);
 
     @Test
     void transfer_successful() {

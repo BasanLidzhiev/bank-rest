@@ -13,7 +13,8 @@ import ru.lidzhiev.bankcards.entity.User;
 import ru.lidzhiev.bankcards.entity.enums.CardStatus;
 import ru.lidzhiev.bankcards.repository.CardRepository;
 import ru.lidzhiev.bankcards.repository.UserRepository;
-import ru.lidzhiev.bankcards.service.impl.CardService;
+import ru.lidzhiev.bankcards.service.impl.CardServiceImpl;
+
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -30,7 +31,7 @@ class CardServiceTest {
     UserRepository userRepository;
 
     @InjectMocks
-    CardService cardService;
+    CardServiceImpl cardService;
 
     User user;
     Card card;
@@ -40,7 +41,7 @@ class CardServiceTest {
         MockitoAnnotations.openMocks(this);
         user = new User();
         user.setId(1L);
-        user.setUsername("alex12");
+        user.setUsername("User12");
 
         card = new Card();
         card.setId(1L);
@@ -53,15 +54,15 @@ class CardServiceTest {
 
     @Test
     void create_shouldSaveCard() {
-        CreateCardDto dto = new CreateCardDto(LocalDate.now().plusYears(1).toString(), 500.0, "alex12");
-        when(userRepository.findByUsername("alex12")).thenReturn(Optional.of(user));
+        CreateCardDto dto = new CreateCardDto(LocalDate.now().plusYears(1).toString(), 500.0, "User12");
+        when(userRepository.findByUsername("User12")).thenReturn(Optional.of(user));
         when(cardRepository.save(any(Card.class))).thenAnswer(inv -> {
             Card saved = inv.getArgument(0, Card.class);
             saved.setId(2L);
             return saved;
         });
-        CardDto result = cardService.create(dto, "alex12");
-        assertEquals("alex12", result.getOwnerUsername());
+        CardDto result = cardService.create(dto, "User12");
+        assertEquals("User12", result.getOwnerUsername());
         assertEquals(500.0, result.getBalance());
     }
 
@@ -69,7 +70,7 @@ class CardServiceTest {
     void getById_shouldReturnCardDto() {
         when(cardRepository.findById(1L)).thenReturn(Optional.of(card));
         CardDto result = cardService.getById(1L);
-        assertEquals("alex12", result.getOwnerUsername());
+        assertEquals("User12", result.getOwnerUsername());
     }
 
     @Test
@@ -82,7 +83,7 @@ class CardServiceTest {
 
         TransferRequestDto dto = new TransferRequestDto(1L, 2L, 100.0);
 
-        cardService.transfer(dto, "alex12");
+        cardService.transfer(dto, "User12");
         assertEquals(400.0, cardFrom.getBalance());
         assertEquals(100.0, cardTo.getBalance());
         verify(cardRepository, times(1)).save(cardFrom);

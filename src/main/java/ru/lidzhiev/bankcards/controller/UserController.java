@@ -7,7 +7,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import ru.lidzhiev.bankcards.dto.CreateUserDto;
 import ru.lidzhiev.bankcards.dto.UserDto;
-import ru.lidzhiev.bankcards.service.impl.UserService;
+import ru.lidzhiev.bankcards.service.UserService;
+
 
 @RestController
 @RequestMapping("/api/users")

@@ -11,7 +11,7 @@ import lombok.Setter;
 @Schema(description = "Request for user login")
 public class SignInRequest {
 
-    @Schema(description = "Username", example = "Alex123")
+    @Schema(description = "Username", example = "User123")
     @Size(min = 5, max = 50, message = "Username length must be between 5 and 50 characters")
     @NotBlank(message = "Username cannot be empty")
     private String username;

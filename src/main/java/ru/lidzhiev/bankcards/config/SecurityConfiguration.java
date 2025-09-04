@@ -1,8 +1,5 @@
 package ru.lidzhiev.bankcards.config;
 
-import ru.lidzhiev.bankcards.security.JwtAuthenticationFilter;
-import ru.lidzhiev.bankcards.security.JwtService;
-import ru.lidzhiev.bankcards.service.impl.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -20,6 +17,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
+import ru.lidzhiev.bankcards.security.JwtAuthenticationFilter;
+import ru.lidzhiev.bankcards.security.JwtService;
+import ru.lidzhiev.bankcards.service.UserService;
 
 import java.util.List;
 

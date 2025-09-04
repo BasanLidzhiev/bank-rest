@@ -20,7 +20,7 @@ import java.util.function.Function;
 @Service
 @Slf4j
 public class JwtService {
-    @Value("${JWT_SECRET}")
+    @Value("${app.jwt.secret}")
     private String jwtSigningKey;
 
     public String extractUserName(String token) {

@@ -16,8 +16,8 @@ import ru.lidzhiev.bankcards.dto.CardDto;
 import ru.lidzhiev.bankcards.dto.CreateCardDto;
 import ru.lidzhiev.bankcards.dto.TransferRequestDto;
 import ru.lidzhiev.bankcards.security.JwtService;
-import ru.lidzhiev.bankcards.service.impl.CardService;
-import ru.lidzhiev.bankcards.service.impl.UserService;
+import ru.lidzhiev.bankcards.service.CardService;
+import ru.lidzhiev.bankcards.service.UserService;
 
 import java.util.List;
 
@@ -47,12 +47,12 @@ class CardControllerTest {
     private UserService userService;
 
     @Test
-    @WithMockUser(username="alex12", roles={"ADMIN"})
+    @WithMockUser(username="User12", roles={"ADMIN"})
     void createCard_ReturnsCardDto_WhenRequestIsValid() throws Exception {
-        CreateCardDto createCardDto = new CreateCardDto("2026-01-01", 1000.0, "alex");
-        CardDto cardDto = new CardDto(1L, "**** **** **** 1234", "ACTIVE", "2026-01-01", 1000.0, "alex");
+        CreateCardDto createCardDto = new CreateCardDto("2026-01-01", 1000.0, "User");
+        CardDto cardDto = new CardDto(1L, "**** **** **** 1234", "ACTIVE", "2026-01-01", 1000.0, "User");
 
-        when(cardService.create(any(CreateCardDto.class), eq("alex12"))).thenReturn(cardDto);
+        when(cardService.create(any(CreateCardDto.class), eq("User12"))).thenReturn(cardDto);
 
         mockMvc.perform(post("/api/cards")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -62,31 +62,31 @@ class CardControllerTest {
     }
 
     @Test
-    @WithMockUser(username="alex12", roles={"USER"})
+    @WithMockUser(username="User12", roles={"USER"})
     void transfer_ReturnsNoContent_WhenTransferSuccessful() throws Exception {
         TransferRequestDto transferRequestDto = new TransferRequestDto(1L, 2L, 100.0);
 
-        doNothing().when(cardService).transfer(any(TransferRequestDto.class), eq("alex12"));
+        doNothing().when(cardService).transfer(any(TransferRequestDto.class), eq("User12"));
 
         mockMvc.perform(post("/api/cards/transfer")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(transferRequestDto)))
                 .andExpect(status().isNoContent());
 
-        verify(cardService, times(1)).transfer(any(TransferRequestDto.class), eq("alex12"));
+        verify(cardService, times(1)).transfer(any(TransferRequestDto.class), eq("User12"));
     }
 
     @Test
-    @WithMockUser(username="alex12", roles={"USER"})
+    @WithMockUser(username="User12", roles={"USER"})
     void getMyCardsPaged_ReturnsPageOfCards() throws Exception {
-        CardDto cardDto1 = new CardDto(1L, "**** **** **** 1234", "ACTIVE", "2026-01-01", 1000.0, "alex");
-        CardDto cardDto2 = new CardDto(2L, "**** **** **** 5678", "ACTIVE", "2026-01-01", 2000.0, "alex");
+        CardDto cardDto1 = new CardDto(1L, "**** **** **** 1234", "ACTIVE", "2026-01-01", 1000.0, "User");
+        CardDto cardDto2 = new CardDto(2L, "**** **** **** 5678", "ACTIVE", "2026-01-01", 2000.0, "User");
         List<CardDto> cards = List.of(cardDto1, cardDto2);
 
         Pageable pageable = PageRequest.of(0, 5);
         PageImpl<CardDto> page = new PageImpl<>(cards, pageable, cards.size());
 
-        when(cardService.getByUsername(eq("alex12"), any(Pageable.class))).thenReturn(page);
+        when(cardService.getByUsername(eq("User12"), any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/api/cards/me/paged")
                         .param("page", "0")

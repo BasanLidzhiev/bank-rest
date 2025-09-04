@@ -7,7 +7,8 @@ import org.springframework.stereotype.Component;
 import ru.lidzhiev.bankcards.dto.CreateUserDto;
 import ru.lidzhiev.bankcards.entity.enums.UserRole;
 import ru.lidzhiev.bankcards.repository.UserRepository;
-import ru.lidzhiev.bankcards.service.impl.UserService;
+import ru.lidzhiev.bankcards.service.UserService;
+
 
 @RequiredArgsConstructor
 @Component

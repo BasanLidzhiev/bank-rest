@@ -3,7 +3,6 @@ package ru.lidzhiev.bankcards.service.impl;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -11,13 +10,14 @@ import ru.lidzhiev.bankcards.dto.CreateUserDto;
 import ru.lidzhiev.bankcards.dto.UserDto;
 import ru.lidzhiev.bankcards.entity.User;
 import ru.lidzhiev.bankcards.repository.UserRepository;
+import ru.lidzhiev.bankcards.service.UserService;
 
 @Service
-public class UserService implements UserDetailsService {
+public class UserServiceImpl implements UserService {
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository repository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository repository, PasswordEncoder passwordEncoder) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
     }

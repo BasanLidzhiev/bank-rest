@@ -11,7 +11,6 @@ import ru.lidzhiev.bankcards.dto.SignUpRequest;
 import ru.lidzhiev.bankcards.entity.User;
 import ru.lidzhiev.bankcards.security.JwtService;
 import ru.lidzhiev.bankcards.service.impl.AuthenticationServiceImpl;
-import ru.lidzhiev.bankcards.service.impl.UserService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -23,7 +22,7 @@ class AuthenticationServiceTest {
     private UserService userService;
     private JwtService jwtService;
     private AuthenticationManager authenticationManager;
-    private ru.lidzhiev.bankcards.service.AuthenticationService authenticationService;
+    private AuthenticationService authenticationService;
 
     @BeforeEach
     void setUp() {
@@ -39,11 +38,11 @@ class AuthenticationServiceTest {
     @Test
     void signUp_ShouldReturnJwtResponse() {
         // Arrange
-        SignUpRequest request = new SignUpRequest("alex12", "alex@mail.com", "pass123");
+        SignUpRequest request = new SignUpRequest("User12", "User@mail.com", "pass123");
         User user = new User();
-        user.setUsername("alex12");
+        user.setUsername("User12");
         when(userService.create(any(CreateUserDto.class))).thenReturn(any());
-        when(userService.findEntityByUsername("alex12")).thenReturn(user);
+        when(userService.findEntityByUsername("User12")).thenReturn(user);
         when(jwtService.generateToken(user)).thenReturn("mocked-jwt-token");
 
         // Act
@@ -59,10 +58,10 @@ class AuthenticationServiceTest {
     @Test
     void signIn_ShouldReturnJwtResponse() {
         // Arrange
-        SignInRequest request = new SignInRequest("alex12", "pass123");
+        SignInRequest request = new SignInRequest("User12", "pass123");
         User user = new User();
-        user.setUsername("alex12");
-        when(userService.findEntityByUsername("alex12")).thenReturn(user);
+        user.setUsername("User12");
+        when(userService.findEntityByUsername("User12")).thenReturn(user);
         when(jwtService.generateToken(user)).thenReturn("mocked-jwt-token");
 
         // Act

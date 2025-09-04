@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.lidzhiev.bankcards.dto.TransferRequestDto;
-import ru.lidzhiev.bankcards.service.impl.TransferService;
+import ru.lidzhiev.bankcards.service.TransferService;
 
 @RequiredArgsConstructor
 @RequestMapping("/api")

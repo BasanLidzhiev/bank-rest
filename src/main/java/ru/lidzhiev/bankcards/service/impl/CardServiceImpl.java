@@ -21,11 +21,11 @@ import static ru.lidzhiev.bankcards.util.CardMaskUtil.maskCardNumber;
 import static ru.lidzhiev.bankcards.util.RandomCardNumber.generateCardNumber;
 
 @Service
-public class CardService {
+public class CardServiceImpl implements ru.lidzhiev.bankcards.service.CardService {
     private final CardRepository cardRepository;
     private final UserRepository userRepository;
 
-    public CardService(CardRepository cardRepository, UserRepository userRepository) {
+    public CardServiceImpl(CardRepository cardRepository, UserRepository userRepository) {
         this.cardRepository = cardRepository;
         this.userRepository = userRepository;
     }

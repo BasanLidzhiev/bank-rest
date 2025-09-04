@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.lidzhiev.bankcards.dto.CardDto;
 import ru.lidzhiev.bankcards.dto.CreateCardDto;
 import ru.lidzhiev.bankcards.dto.TransferRequestDto;
-import ru.lidzhiev.bankcards.service.impl.CardService;
+import ru.lidzhiev.bankcards.service.CardService;
 
 import java.util.List;
 
