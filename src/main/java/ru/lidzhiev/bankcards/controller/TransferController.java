@@ -1,0 +1,27 @@
+package ru.lidzhiev.bankcards.controller;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import ru.lidzhiev.bankcards.dto.TransferRequestDto;
+import ru.lidzhiev.bankcards.service.impl.TransferService;
+
+@RequiredArgsConstructor
+@RequestMapping("/api")
+@RestController
+public class TransferController {
+    private final TransferService transferService;
+
+    @PostMapping("/transfer")
+    public ResponseEntity<Void> transfer(@RequestBody TransferRequestDto transferRequest) {
+        transferService.transfer(
+                transferRequest.getFromCardId(),
+                transferRequest.getToCardId(),
+                transferRequest.getAmount()
+        );
+        return ResponseEntity.ok().build();
+    }
+}
