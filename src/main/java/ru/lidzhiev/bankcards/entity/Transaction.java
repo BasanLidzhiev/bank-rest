@@ -1,10 +1,14 @@
 package ru.lidzhiev.bankcards.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 
+@Setter
+@Getter
 @Entity
 @Table(name = "transactions")
 public class Transaction {
@@ -24,51 +28,4 @@ public class Transaction {
     private LocalDateTime createdAt;
     private String status;
 
-    public Double getAmount() {
-        return amount;
-    }
-
-    public void setAmount(Double amount) {
-        this.amount = amount;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Card getFromCard() {
-        return fromCard;
-    }
-
-    public void setFromCard(Card fromCard) {
-        this.fromCard = fromCard;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public Card getToCard() {
-        return toCard;
-    }
-
-    public void setToCard(Card toCard) {
-        this.toCard = toCard;
-    }
 }

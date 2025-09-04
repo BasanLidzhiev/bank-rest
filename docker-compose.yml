@@ -9,19 +9,11 @@ services:
       POSTGRES_DB: ${PG_DB}
     ports:
       - "5433:5433"
-#    healthcheck:
-#      test: [ "CMD", "pg_isready", "-U", "$${PG_USERNAME}", "-d", "$${PG_DB}" ]
-#      interval: 10s
-#      timeout: 5s
-#      retries: 5
     volumes:
       - db_data:/var/lib/postgresql/data_bank
 
   app:
     build: .
-#    depends_on:
-#      db:
-#        condition: service_healthy
     ports:
       - "8080:8080"
     environment:
