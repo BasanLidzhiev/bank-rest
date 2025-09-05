@@ -20,7 +20,7 @@ spring:
     database: POSTGRESQL
   liquibase:
     enabled: true
-    change-log: classpath:db/migration/changelog-master.yaml
+    change-log: classpath:db/migration/changelog/changelog-master.yaml
 
 app:
   jwt:
