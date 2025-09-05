@@ -2,7 +2,6 @@ package ru.lidzhiev.bankcards.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import ru.lidzhiev.bankcards.entity.User;
 
-import java.security.Key;
+import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +21,9 @@ import java.util.function.Function;
 public class JwtService {
     @Value("${app.jwt.secret}")
     private String jwtSigningKey;
+    @Value("${app.jwt.expiration.hours}")
+    private int tokenExpirationHours;
+    public static long millisecondsInHour = 60 * 60 * 1000;
 
     public String extractUserName(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -41,18 +43,16 @@ public class JwtService {
         final String userName = extractUserName(token);
         return (userName.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
-    // t - type of data to be extracted
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolvers) {
         final Claims claims = extractAllClaims(token);
         return claimsResolvers.apply(claims);
     }
 
-    //extraClaims - extracting additional claims from the token
     private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return Jwts.builder().claims(extraClaims).subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) //24 hours expiration
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256).compact();
+                .expiration(new Date(System.currentTimeMillis() + tokenExpirationHours * millisecondsInHour)) //24 hours expiration
+                .signWith(getSigningKey()).compact();
     }
 
     private boolean isTokenExpired(String token) {
@@ -64,12 +64,11 @@ public class JwtService {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser().setSigningKey(getSigningKey()).build().parseSignedClaims(token)
-                .getBody();
+        return Jwts.parser().verifyWith(getSigningKey()).build().parseSignedClaims(token).getPayload();
     }
 
     // Method to get the signing key from the base64 encoded string
-    private Key getSigningKey() {
+    private SecretKey getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(jwtSigningKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }

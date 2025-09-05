@@ -25,6 +25,8 @@ spring:
 app:
   jwt:
     secret: ${JWT_SECRET:976158266ca2e3a13918e4d3fc067e8f9113a300ba1f6f7539ff6f3085e1a79a}
+    expiration:
+      hours: ${JWT_EXPIRATION_HOURS:24}
 
 springdoc:
   swagger-ui:
