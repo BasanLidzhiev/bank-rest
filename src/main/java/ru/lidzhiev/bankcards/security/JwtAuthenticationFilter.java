@@ -18,6 +18,11 @@ import ru.lidzhiev.bankcards.service.UserService;
 
 import java.io.IOException;
 
+/**
+ * Фильтр аутентификации на основе JSON Web Token (JWT).
+ * Этот фильтр обрабатывает запросы HTTP, извлекает JWT-токены из заголовков и проверяет их действительность.
+ * Если токен действительный, устанавливается соответствующий объект аутентификации в контексте безопасности Spring Security.
+ */
 @Component
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -31,6 +36,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.userService = userService;
     }
 
+    /**
+     * Основной метод фильтрации запроса.
+     * Извлекает JWT-токен из заголовка Authorization, проверяет его подлинность и устанавливает объект аутентификации.
+     *
+     * @param request     HTTP-запрос.
+     * @param response    HTTP-ответ.
+     * @param filterChain цепочка фильтров.
+     * @throws ServletException   исключения сервлета.
+     * @throws IOException        исключения ввода-вывода.
+     */
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
