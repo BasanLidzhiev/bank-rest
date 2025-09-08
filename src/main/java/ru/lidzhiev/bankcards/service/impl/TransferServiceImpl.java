@@ -5,10 +5,12 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.lidzhiev.bankcards.dto.TransferRequestDto;
 import ru.lidzhiev.bankcards.entity.Card;
 import ru.lidzhiev.bankcards.entity.Transaction;
+import ru.lidzhiev.bankcards.exception.CardOperationException;
+import ru.lidzhiev.bankcards.exception.ErrorCode;
+import ru.lidzhiev.bankcards.exception.ResourceNotFoundException;
 import ru.lidzhiev.bankcards.repository.CardRepository;
 import ru.lidzhiev.bankcards.repository.TransactionRepository;
 import ru.lidzhiev.bankcards.service.TransferService;
-import ru.lidzhiev.bankcards.util.CardMaskUtil;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -36,18 +38,18 @@ public class TransferServiceImpl implements TransferService {
 
     private Card findUserCard (String cardNumber) {
         return cardRepository.findByNumber(cardNumber)
-                .orElseThrow(() -> new RuntimeException("Card with number " + CardMaskUtil.maskCardNumber(cardNumber) + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.CARD_NOT_FOUND));
     }
 
     private void validateTransfer(TransferRequestDto dto, Card from, Card to) {
         if (from.getId().equals(to.getId())) {
-            throw new IllegalArgumentException("Cannot transfer to the same card");
+            throw new CardOperationException(ErrorCode.SAME_CARD_TRANSFER);
         }
         if (!from.getStatus().equals("ACTIVE") || !to.getStatus().equals("ACTIVE")) {
-            throw new RuntimeException("Одна из карт заблокирована или неактивна");
+            throw new CardOperationException(ErrorCode.CARD_BLOCKED);
         }
         if (from.getBalance() < dto.getAmount()) {
-            throw new IllegalArgumentException("Not enough balance to transfer");
+            throw new CardOperationException(ErrorCode.CARD_INSUFFICIENT_FUNDS);
         }
     }
 

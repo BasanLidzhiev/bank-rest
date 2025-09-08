@@ -1,13 +1,12 @@
 package ru.lidzhiev.bankcards.service;
 
+import org.junit.jupiter.api.Test;
 import ru.lidzhiev.bankcards.dto.TransferRequestDto;
 import ru.lidzhiev.bankcards.entity.Card;
 import ru.lidzhiev.bankcards.entity.Transaction;
 import ru.lidzhiev.bankcards.repository.CardRepository;
 import ru.lidzhiev.bankcards.repository.TransactionRepository;
-import org.junit.jupiter.api.Test;
 import ru.lidzhiev.bankcards.service.impl.TransferServiceImpl;
-
 
 import java.util.List;
 import java.util.Optional;
@@ -61,7 +60,7 @@ class TransactionServiceTest {
 
         RuntimeException e = assertThrows(RuntimeException.class,
                 () -> transactionService.transfer(dto));
-        assertTrue(e.getMessage().contains("Not enough balance to transfer"));
+        assertTrue(e.getMessage().contains("Недостаточно средств на карте"));
     }
 
     @Test
@@ -79,7 +78,7 @@ class TransactionServiceTest {
 
         RuntimeException e = assertThrows(RuntimeException.class,
                 () -> transactionService.transfer(dto));
-        assertTrue(e.getMessage().contains("Одна из карт заблокирована"));
+        assertTrue(e.getMessage().contains("Операция невозможна: карта заблокирована"));
     }
 }
 

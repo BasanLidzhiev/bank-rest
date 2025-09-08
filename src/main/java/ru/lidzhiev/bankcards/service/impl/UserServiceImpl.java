@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 import ru.lidzhiev.bankcards.dto.CreateUserDto;
 import ru.lidzhiev.bankcards.dto.UserDto;
 import ru.lidzhiev.bankcards.entity.User;
+import ru.lidzhiev.bankcards.exception.ErrorCode;
+import ru.lidzhiev.bankcards.exception.ResourceNotFoundException;
+import ru.lidzhiev.bankcards.exception.UserOperationException;
 import ru.lidzhiev.bankcards.repository.UserRepository;
 import ru.lidzhiev.bankcards.service.UserService;
 
@@ -25,15 +28,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return repository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND));
     }
 
     public UserDto create(CreateUserDto dto) {
         if (repository.existsByUsername(dto.getUsername())) {
-            throw new RuntimeException("User with this username already exists");
+            throw new UserOperationException(ErrorCode.USER_ALREADY_EXISTS);
         }
         if (repository.existsByEmail(dto.getEmail())) {
-            throw new RuntimeException("User with this email already exists");
+            throw new UserOperationException(ErrorCode.USER_ALREADY_EXISTS);
         }
 
         User user = new User();
@@ -49,7 +52,7 @@ public class UserServiceImpl implements UserService {
     // get entity by username for JWT
     public User findEntityByUsername(String username) {
         return repository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND));
     }
 
     // get username for controller
@@ -60,7 +63,7 @@ public class UserServiceImpl implements UserService {
 
     public UserDto getById(Long id) {
         User user = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND));
         return toDto(user);
     }
 
@@ -68,7 +71,7 @@ public class UserServiceImpl implements UserService {
     @PreAuthorize("hasRole('ADMIN')")
     public UserDto updateUser(UserDto dto) {
         User user = repository.findById(dto.getId())
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + dto.getId()));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND));
         user.setUsername(dto.getUsername());
         user.setEmail(dto.getEmail());
         User updated = repository.save(user);
@@ -79,7 +82,7 @@ public class UserServiceImpl implements UserService {
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteUser(Long id) {
         User user = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND));
         repository.delete(user);
     }
 
