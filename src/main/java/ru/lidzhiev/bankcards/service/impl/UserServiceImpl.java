@@ -15,6 +15,11 @@ import ru.lidzhiev.bankcards.exception.UserOperationException;
 import ru.lidzhiev.bankcards.repository.UserRepository;
 import ru.lidzhiev.bankcards.service.UserService;
 
+/**
+ * Реализация интерфейса UserService, предназначенного для работы с сущностью пользователя.
+ * Поддерживает операции по созданию, загрузке, обновлению и удалению пользователей.
+ * Использует шифрование паролей с помощью Spring Security PasswordEncoder.
+ */
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository repository;
@@ -25,12 +30,22 @@ public class UserServiceImpl implements UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * Загружает пользователя по имени пользователя (username).
+     *
+     * @param username Имя пользователя для поиска.
+     * @return Объект UserDetails с информацией о загруженном пользователе.
+     * @throws UsernameNotFoundException Если пользователь не найден.
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return repository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public UserDto create(CreateUserDto dto) {
         if (repository.existsByUsername(dto.getUsername())) {
             throw new UserOperationException(ErrorCode.USER_ALREADY_EXISTS);
@@ -49,25 +64,34 @@ public class UserServiceImpl implements UserService {
         return toDto(saved);
     }
 
-    // get entity by username for JWT
+    /**
+     * {@inheritDoc}
+     */
     public User findEntityByUsername(String username) {
         return repository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND));
     }
 
-    // get username for controller
+    /**
+     * {@inheritDoc}
+     */
     public UserDto getByUsername(String username) {
         User user = findEntityByUsername(username);
         return toDto(user);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public UserDto getById(Long id) {
         User user = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND));
         return toDto(user);
     }
 
-    // Only ADMIN
+    /**
+     * {@inheritDoc}
+     */
     @PreAuthorize("hasRole('ADMIN')")
     public UserDto updateUser(UserDto dto) {
         User user = repository.findById(dto.getId())
@@ -78,7 +102,9 @@ public class UserServiceImpl implements UserService {
         return toDto(updated);
     }
 
-    // only ADMIN
+    /**
+     * {@inheritDoc}
+     */
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteUser(Long id) {
         User user = repository.findById(id)
@@ -86,13 +112,18 @@ public class UserServiceImpl implements UserService {
         repository.delete(user);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public UserDto getCurrentUser() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = findEntityByUsername(username);
         return toDto(user);
     }
 
-    //Converter method to convert User entity to UserDto
+    /**
+     * {@inheritDoc}
+     */
     public UserDto toDto(User user) {
         return new UserDto(user.getId(), user.getUsername(), user.getEmail());
     }

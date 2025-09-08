@@ -13,7 +13,10 @@ import ru.lidzhiev.bankcards.security.JwtService;
 import ru.lidzhiev.bankcards.service.AuthenticationService;
 import ru.lidzhiev.bankcards.service.UserService;
 
-
+/**
+ * Сервис аутентификации пользователей.
+ * Этот класс реализует интерфейс {@link AuthenticationService}, обеспечивая функциональность регистрации и входа пользователей.
+**/
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserService userService;
@@ -26,6 +29,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         this.authenticationManager = authenticationManager;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JwtAuthenticationResponse signUp(SignUpRequest request) {
         CreateUserDto createUserDto = new CreateUserDto(
@@ -44,6 +50,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     // user login
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JwtAuthenticationResponse signIn(SignInRequest request) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(

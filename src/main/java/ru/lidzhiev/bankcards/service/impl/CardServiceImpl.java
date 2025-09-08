@@ -23,7 +23,12 @@ import java.util.List;
 
 import static ru.lidzhiev.bankcards.util.CardMaskUtil.maskCardNumber;
 import static ru.lidzhiev.bankcards.util.RandomCardNumber.generateCardNumber;
-
+/**
+ * Реализация интерфейса {@link CardService} для операций с банковскими картами.
+ * Данный класс обеспечивает управление карточными операциями: создание новых карт, обновление статуса карты, получение списка карт,
+ * выполнение переводов денежных средств и удаление карт. Некоторые методы требуют роли администратора ("ADMIN").
+ * Методы, доступные только администраторам, отмечены аннотацией `@PreAuthorize`.
+ */
 @Service
 public class CardServiceImpl implements CardService {
     private final CardRepository cardRepository;
@@ -34,6 +39,9 @@ public class CardServiceImpl implements CardService {
         this.userRepository = userRepository;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @PreAuthorize("hasRole('ADMIN')")
     public CardDto create(CreateCardDto dto, String username) {
         if (dto.getBalance() != null && dto.getBalance() < 0) {
@@ -58,6 +66,9 @@ public class CardServiceImpl implements CardService {
         return toDto(saved);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public CardDto userRequestCardBlock(CardDto dto, String username) {
         Card card = cardRepository.findById(dto.getId())
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.CARD_NOT_FOUND));
@@ -73,7 +84,9 @@ public class CardServiceImpl implements CardService {
         Card updated = cardRepository.save(card);
         return toDto(updated);
     }
-
+    /**
+     * {@inheritDoc}
+     */
     @PreAuthorize("hasRole('ADMIN')")
     public CardDto blockCard(Long cardId) {
         Card card = cardRepository.findById(cardId)
@@ -82,19 +95,26 @@ public class CardServiceImpl implements CardService {
         Card saved = cardRepository.save(card);
         return toDto(saved);
     }
-
+    /**
+     * {@inheritDoc}
+     */
     public Page<CardDto> getByUsername(String username, Pageable pageable) {
         Page<Card> cards = cardRepository.findByOwnerUsername(username, pageable);
         return cards.map(this::toDto);
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
     public CardDto getById(Long id) {
         Card card = cardRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.CARD_NOT_FOUND));
         return toDto(card);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public CardDto adminUpdateCardStatus(Long id, String status) {
         Card card = cardRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.CARD_NOT_FOUND));
@@ -110,6 +130,9 @@ public class CardServiceImpl implements CardService {
         return toDto(updated);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteCard(Long id) {
         Card card = cardRepository.findById(id)
@@ -117,6 +140,9 @@ public class CardServiceImpl implements CardService {
         cardRepository.delete(card);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @PreAuthorize("hasRole('ADMIN')")
     public List<CardDto> getAllCards() {
         return cardRepository.findAll()
@@ -125,12 +151,26 @@ public class CardServiceImpl implements CardService {
                 .toList();
     }
 
-    // Find owner by по username
+    /**
+     * Приватный метод поиска пользователя по имени.
+     * Используется для нахождения владельца карты.
+     *
+     * @param username имя пользователя.
+     * @return объект пользователя.
+     * @throws ResourceNotFoundException если пользователь не найден.
+     */
     private User findUserEntityByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND));
     }
 
+    /**
+     * Приватный метод преобразования сущности Card в объект DTO.
+     * Скрывает номер карты, отображая его в замаскированном виде.
+     *
+     * @param card сущность карты.
+     * @return объект DTO карты.
+     */
     public CardDto toDto(Card card) {
         return new CardDto(
                 card.getId(),
@@ -142,6 +182,9 @@ public class CardServiceImpl implements CardService {
         );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Transactional
     public void transfer(TransferRequestDto dto, String username) {
         Card from = cardRepository.findByNumber(dto.getFromCardNumber())
@@ -157,12 +200,31 @@ public class CardServiceImpl implements CardService {
         cardRepository.save(to);
     }
 
+    /**
+     * Приватный метод проверки принадлежности двух карт одному пользователю.
+     * Проверяет, принадлежат ли обе карты указанному пользователю.
+     *
+     * @param username имя пользователя.
+     * @param from     исходная карта.
+     * @param to       целевая карта.
+     * @throws CardOperationException если одна из карт не принадлежит пользователю.
+     */
     private void validateUserCards(String username, Card from, Card to) {
         if (!from.getOwner().getUsername().equals(username) || !to.getOwner().getUsername().equals(username)) {
             throw new CardOperationException(ErrorCode.NOT_OWNER);
         }
     }
 
+    /**
+     * Приватный метод проверки условий перевода.
+     * Проверяет условия для осуществления перевода: совпадение номеров карт, активные статусы карт, достаточность средств.
+     *
+     * @param dto       объект DTO с деталями перевода.
+     * @param username  имя пользователя владельца карт.
+     * @param from      исходная карта.
+     * @param to        целевая карта.
+     * @throws CardOperationException если возникает ошибка при проверке условий.
+     */
     private void validateTransfer(TransferRequestDto dto, String username, Card from, Card to) {
         if (from.getId().equals(to.getId())) {
             throw new CardOperationException(ErrorCode.SAME_CARD_TRANSFER);
