@@ -1,5 +1,6 @@
 package ru.lidzhiev.bankcards.service;
 
+import ru.lidzhiev.bankcards.dto.TransferRequestDto;
 import ru.lidzhiev.bankcards.entity.Card;
 import ru.lidzhiev.bankcards.entity.Transaction;
 import ru.lidzhiev.bankcards.repository.CardRepository;
@@ -8,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import ru.lidzhiev.bankcards.service.impl.TransferServiceImpl;
 
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,46 +24,61 @@ class TransactionServiceTest {
 
     @Test
     void transfer_successful() {
-        Card from = new Card(); from.setId(1L); from.setBalance(100.0); from.setStatus("ACTIVE");
-        Card to = new Card(); to.setId(2L); to.setBalance(50.0); to.setStatus("ACTIVE");
+        Card from = new Card(); from.setId(1L); from.setBalance(100.0); from.setStatus("ACTIVE"); from.setNumber("1234");
+        Card to = new Card(); to.setId(2L); to.setBalance(50.0); to.setStatus("ACTIVE"); to.setNumber("1233");
 
-        when(cardRepository.findById(1L)).thenReturn(Optional.of(from));
-        when(cardRepository.findById(2L)).thenReturn(Optional.of(to));
+        TransferRequestDto dto = TransferRequestDto.builder()
+                .fromCardNumber("1234")
+                .toCardNumber("1233")
+                .amount(30.0)
+                .build();
+
+        when(cardRepository.findByNumber(dto.getFromCardNumber())).thenReturn(Optional.of(from));
+        when(cardRepository.findByNumber(dto.getToCardNumber())).thenReturn(Optional.of(to));
         when(transactionRepository.save(any(Transaction.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Transaction result = transactionService.transfer(1L, 2L, 30.0);
+        Transaction result = transactionService.transfer(dto);
 
         assertEquals(70.0, from.getBalance());
         assertEquals(80.0, to.getBalance());
         assertEquals("COMPLETED", result.getStatus());
-        verify(cardRepository, times(1)).save(from);
-        verify(cardRepository, times(1)).save(to);
+        verify(cardRepository, times(1)).saveAll(List.of(from, to));
         verify(transactionRepository, times(1)).save(any(Transaction.class));
     }
 
     @Test
     void transfer_notEnoughFunds() {
-        Card from = new Card(); from.setId(1L); from.setBalance(10.0); from.setStatus("ACTIVE");
-        Card to = new Card(); to.setId(2L); to.setBalance(50.0); to.setStatus("ACTIVE");
+        Card from = new Card(); from.setId(1L); from.setBalance(10.0); from.setStatus("ACTIVE"); from.setNumber("1234");
+        Card to = new Card(); to.setId(2L); to.setBalance(50.0); to.setStatus("ACTIVE"); to.setNumber("1233");
 
-        when(cardRepository.findById(1L)).thenReturn(Optional.of(from));
-        when(cardRepository.findById(2L)).thenReturn(Optional.of(to));
+        TransferRequestDto dto = TransferRequestDto.builder()
+                .fromCardNumber("1234")
+                .toCardNumber("1233")
+                .amount(20.0)
+                .build();
+        when(cardRepository.findByNumber(dto.getFromCardNumber())).thenReturn(Optional.of(from));
+        when(cardRepository.findByNumber(dto.getToCardNumber())).thenReturn(Optional.of(to));
 
         RuntimeException e = assertThrows(RuntimeException.class,
-                () -> transactionService.transfer(1L, 2L, 20.0));
-        assertTrue(e.getMessage().contains("Недостаточно средств"));
+                () -> transactionService.transfer(dto));
+        assertTrue(e.getMessage().contains("Not enough balance to transfer"));
     }
 
     @Test
     void transfer_blockedCard() {
-        Card from = new Card(); from.setId(1L); from.setBalance(100.0); from.setStatus("BLOCKED");
-        Card to = new Card(); to.setId(2L); to.setBalance(50.0); to.setStatus("ACTIVE");
+        Card from = new Card(); from.setId(1L); from.setBalance(30.0); from.setStatus("BLOCKED"); from.setNumber("1234");
+        Card to = new Card(); to.setId(2L); to.setBalance(50.0); to.setStatus("ACTIVE"); to.setNumber("1233");
 
-        when(cardRepository.findById(1L)).thenReturn(Optional.of(from));
-        when(cardRepository.findById(2L)).thenReturn(Optional.of(to));
+        TransferRequestDto dto = TransferRequestDto.builder()
+                .fromCardNumber("1234")
+                .toCardNumber("1233")
+                .amount(20.0)
+                .build();
+        when(cardRepository.findByNumber(dto.getFromCardNumber())).thenReturn(Optional.of(from));
+        when(cardRepository.findByNumber(dto.getToCardNumber())).thenReturn(Optional.of(to));
 
         RuntimeException e = assertThrows(RuntimeException.class,
-                () -> transactionService.transfer(1L, 2L, 20.0));
+                () -> transactionService.transfer(dto));
         assertTrue(e.getMessage().contains("Одна из карт заблокирована"));
     }
 }

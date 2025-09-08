@@ -1,6 +1,7 @@
 package ru.lidzhiev.bankcards.controller;
 
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +17,7 @@ import ru.lidzhiev.bankcards.service.CardService;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/cards")
 public class CardController {
@@ -39,7 +41,7 @@ public class CardController {
     @PostMapping
     public CardDto createCard(@Valid @RequestBody CreateCardDto dto,
                               @AuthenticationPrincipal UserDetails userDetails) {
-        return cardService.create(dto, userDetails.getUsername());
+        return cardService.create(dto, dto.getUsername());
     }
 
     @GetMapping("/{id}")

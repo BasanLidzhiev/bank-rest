@@ -75,13 +75,15 @@ class CardServiceTest {
 
     @Test
     void transfer_shouldTransferIfValid() {
-        Card cardFrom = new Card(); cardFrom.setId(1L); cardFrom.setOwner(user); cardFrom.setBalance(500.0);
-        Card cardTo = new Card(); cardTo.setId(2L); cardTo.setOwner(user); cardTo.setBalance(0.0);
+        Card cardFrom = new Card(); cardFrom.setId(1L); cardFrom.setNumber("1234"); cardFrom.setOwner(user);
+        cardFrom.setBalance(500.0); cardFrom.setStatus("ACTIVE");
+        Card cardTo = new Card(); cardFrom.setId(2L); cardTo.setNumber("1233"); cardTo.setOwner(user);
+        cardTo.setBalance(0.0); cardTo.setStatus("ACTIVE");
 
-        when(cardRepository.findById(1L)).thenReturn(Optional.of(cardFrom));
-        when(cardRepository.findById(2L)).thenReturn(Optional.of(cardTo));
+        when(cardRepository.findByNumber("1234")).thenReturn(Optional.of(cardFrom));
+        when(cardRepository.findByNumber("1233")).thenReturn(Optional.of(cardTo));
 
-        TransferRequestDto dto = new TransferRequestDto(1L, 2L, 100.0);
+        TransferRequestDto dto = new TransferRequestDto("1234", "1233", 100.0);
 
         cardService.transfer(dto, "User12");
         assertEquals(400.0, cardFrom.getBalance());

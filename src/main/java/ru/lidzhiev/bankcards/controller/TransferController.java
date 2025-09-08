@@ -17,11 +17,7 @@ public class TransferController {
 
     @PostMapping("/transfer")
     public ResponseEntity<Void> transfer(@RequestBody TransferRequestDto transferRequest) {
-        transferService.transfer(
-                transferRequest.getFromCardId(),
-                transferRequest.getToCardId(),
-                transferRequest.getAmount()
-        );
+        transferService.transfer(transferRequest);
         return ResponseEntity.ok().build();
     }
 }

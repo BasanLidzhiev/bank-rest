@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.lidzhiev.bankcards.dto.CardDto;
 import ru.lidzhiev.bankcards.dto.CreateCardDto;
 import ru.lidzhiev.bankcards.dto.TransferRequestDto;
@@ -13,6 +14,7 @@ import ru.lidzhiev.bankcards.entity.User;
 import ru.lidzhiev.bankcards.entity.enums.CardStatus;
 import ru.lidzhiev.bankcards.repository.CardRepository;
 import ru.lidzhiev.bankcards.repository.UserRepository;
+import ru.lidzhiev.bankcards.service.CardService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -21,7 +23,7 @@ import static ru.lidzhiev.bankcards.util.CardMaskUtil.maskCardNumber;
 import static ru.lidzhiev.bankcards.util.RandomCardNumber.generateCardNumber;
 
 @Service
-public class CardServiceImpl implements ru.lidzhiev.bankcards.service.CardService {
+public class CardServiceImpl implements CardService {
     private final CardRepository cardRepository;
     private final UserRepository userRepository;
 
@@ -138,30 +140,38 @@ public class CardServiceImpl implements ru.lidzhiev.bankcards.service.CardServic
         );
     }
 
+    @Transactional
     public void transfer(TransferRequestDto dto, String username) {
-        if (dto.getFromCardId().equals(dto.getToCardId())) {
-            throw new IllegalArgumentException("Cannot transfer to the same card");
-        }
-
-        Card from = cardRepository.findById(dto.getFromCardId())
+        Card from = cardRepository.findByNumber(dto.getFromCardNumber())
                 .orElseThrow(() -> new RuntimeException("From-card not found"));
-        Card to = cardRepository.findById(dto.getToCardId())
+        Card to = cardRepository.findByNumber(dto.getToCardNumber())
                 .orElseThrow(() -> new RuntimeException("To-card not found"));
-
-        // check owner both cards
-        if (!from.getOwner().getUsername().equals(username) || !to.getOwner().getUsername().equals(username)) {
-            throw new SecurityException("Both cards must belong to the current user");
-        }
-
-        if (from.getBalance() < dto.getAmount()) {
-            throw new IllegalArgumentException("Not enough balance to transfer");
-        }
-
+        validateUserCards(username, from, to);
+        validateTransfer(dto, username, from, to);
         from.setBalance(from.getBalance() - dto.getAmount());
         to.setBalance(to.getBalance() + dto.getAmount());
 
         cardRepository.save(from);
         cardRepository.save(to);
     }
+
+    private void validateUserCards(String username, Card from, Card to) {
+        if (!from.getOwner().getUsername().equals(username) || !to.getOwner().getUsername().equals(username)) {
+            throw new SecurityException("Both cards must belong to the current user");
+        }
+    }
+
+    private void validateTransfer(TransferRequestDto dto, String username, Card from, Card to) {
+        if (from.getId().equals(to.getId())) {
+            throw new IllegalArgumentException("Cannot transfer to the same card");
+        }
+        if (!from.getStatus().equals("ACTIVE") || !to.getStatus().equals("ACTIVE")) {
+            throw new RuntimeException("One of the cards blocked or inactive");
+        }
+        if (from.getBalance() < dto.getAmount()) {
+            throw new IllegalArgumentException("Not enough balance to transfer");
+        }
+    }
+
 
 }

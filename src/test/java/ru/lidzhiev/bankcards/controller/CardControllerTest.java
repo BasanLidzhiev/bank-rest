@@ -52,7 +52,7 @@ class CardControllerTest {
         CreateCardDto createCardDto = new CreateCardDto("2026-01-01", 1000.0, "User");
         CardDto cardDto = new CardDto(1L, "**** **** **** 1234", "ACTIVE", "2026-01-01", 1000.0, "User");
 
-        when(cardService.create(any(CreateCardDto.class), eq("User12"))).thenReturn(cardDto);
+        when(cardService.create(any(CreateCardDto.class), eq("User"))).thenReturn(cardDto);
 
         mockMvc.perform(post("/api/cards")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -64,7 +64,7 @@ class CardControllerTest {
     @Test
     @WithMockUser(username="User12", roles={"USER"})
     void transfer_ReturnsNoContent_WhenTransferSuccessful() throws Exception {
-        TransferRequestDto transferRequestDto = new TransferRequestDto(1L, 2L, 100.0);
+        TransferRequestDto transferRequestDto = new TransferRequestDto("1234", "1233", 100.0);
 
         doNothing().when(cardService).transfer(any(TransferRequestDto.class), eq("User12"));
 
